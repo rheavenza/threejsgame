@@ -1,0 +1,32 @@
+# Decision Log
+
+This file records decisions and their status so agents do not mistake brainstorming for canon.
+
+## Status vocabulary
+
+- **LOCKED:** project owner explicitly approved; agents must follow it.
+- **WORKING:** current preferred direction, but still open to revision.
+- **OPEN:** several options remain under consideration.
+- **DEFERRED:** intentionally not decided until a later milestone.
+- **REJECTED:** considered and declined; do not quietly reintroduce.
+
+## Current entries
+
+| ID | Topic | Status | Current direction |
+|---|---|---|---|
+| D-001 | Target repository | LOCKED | rheavenza/threejsgame |
+| D-002 | Engine direction | WORKING | Three.js + TypeScript; first sprint should validate the stack |
+| D-003 | Broad visual mood | WORKING | Luminous emerald/blue/ochre valley with a distinctly pixelated, faceted 3D appearance |
+| D-004 | Opening structure | WORKING | Outsider traveler; peaceful town; earn temporary shelter; small social mystery late in first 30 minutes |
+| D-005 | Main theme | WORKING | Names, identity, memory, belonging, and who gets to define a person |
+| D-006 | Game title | OPEN | Do not invent a final title |
+| D-007 | World metaphysics | OPEN | Naming may have social, political, or supernatural consequences; no final rule |
+| D-008 | Protagonist history | OPEN | Traveler from outside the town; exact motivation/backstory undecided |
+| D-009 | Full life-sim scope | DEFERRED | Build the foundation first; marriage/adoption are future systems |
+| D-010 | Visual reference file | OPEN | Owner supplied a reference in conversation; copy into repository before visual acceptance can be delegated |
+| D-011 | Exact pixel resolution | OPEN | Compare several internal resolutions during look-dev |
+| D-012 | Rendering/physics/gameplay libraries | DEFERRED | Select only when a testable ticket needs them |
+
+## Change rule
+
+Any major creative or architecture change must update this log in the same PR as the design/ticket that authorizes it. If two documents conflict, do not guess which is newer; stop, report the conflict, and request owner direction.
