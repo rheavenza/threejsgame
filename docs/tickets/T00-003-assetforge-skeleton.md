@@ -68,6 +68,7 @@ npm --prefix tools/assetforge run check
 npm --prefix tools/assetforge test
 npm --prefix tools/assetforge run validate-sample
 npm --prefix tools/assetforge run smoke
+npm --prefix tools/assetforge run validate-manifest -- assets/_work/assetforge/<job-id>/manifest.json
 git diff --check
 codex mcp list
 ```

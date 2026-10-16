@@ -1,0 +1,9 @@
+[mcp_servers.assetforge]
+command = "node"
+args = ["tools/assetforge/src/server.mjs"]
+cwd = "."
+startup_timeout_sec = 10
+tool_timeout_sec = 30
+
+[mcp_servers.assetforge.tools.spec_validate]
+approval_mode = "auto"
