@@ -186,20 +186,22 @@ resizeObserver.observe(hostElement);
 window.addEventListener('resize', resizeRenderer);
 resizeRenderer();
 
-window.addEventListener(
-  'pagehide',
-  () => {
-    resizeObserver.disconnect();
-    window.removeEventListener('resize', resizeRenderer);
-    renderer.dispose();
-    scene.traverse((object) => {
-      if (object instanceof THREE.Mesh) {
-        object.geometry.dispose();
-        const materials = Array.isArray(object.material) ? object.material : [object.material];
-        materials.forEach((material) => material.dispose());
-      }
-    });
-  },
-  { once: true },
-);
+window.addEventListener('pagehide', (event) => {
+  if (event.persisted) return;
+
+  resizeObserver.disconnect();
+  window.removeEventListener('resize', resizeRenderer);
+  renderer.dispose();
+  scene.traverse((object) => {
+    if (object instanceof THREE.Mesh) {
+      object.geometry.dispose();
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      materials.forEach((material) => material.dispose());
+    }
+  });
+});
+
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) resizeRenderer();
+});
 
