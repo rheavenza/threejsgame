@@ -13,6 +13,7 @@ Status changes are maintained by the planning/review agent after checking GitHub
 
 - [ ] T00-001 — Minimal Three.js application shell (READY; 3 points).
 - [ ] T00-002 — Pixel-resolution look-dev controls and test scene (BLOCKED on T00-001; 3 points).
+- [ ] T00-003 — Assetforge skeleton (READY; 3 points; independent infrastructure ticket, not a T00-002 dependency).
 - [ ] Owner review — accept/revise pixel size, palette balance, lighting, and pixel pipeline.
 
 ## Phase 1 — Walkable valley and town approach
