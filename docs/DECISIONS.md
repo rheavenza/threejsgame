@@ -26,6 +26,11 @@ This file records decisions and their status so agents do not mistake brainstorm
 | D-010 | Visual reference file | OPEN | Owner supplied a reference in conversation; copy into repository before visual acceptance can be delegated |
 | D-011 | Exact pixel resolution | OPEN | Compare several internal resolutions during look-dev |
 | D-012 | Rendering/physics/gameplay libraries | DEFERRED | Select only when a testable ticket needs them |
+| D-013 | Asset generation pipeline | WORKING | Codex-driven, MCP-based pipeline (concept -> mesh -> cleanup -> rig -> motion -> preview -> publish) with owner gates G1/G2; see docs/ASSET_PIPELINE.md. Proposal only; nothing implemented |
+| D-014 | Asset generation providers | OPEN | NVIDIA-hosted FLUX/TRELLIS endpoints for prototyping only (API trial terms); rig/motion providers (UniRig, Kimodo) and GPU hosting undecided; no provider is approved for shipped assets |
+| D-015 | Asset provenance and license status | WORKING | Every generated asset carries a manifest; license_status stays `prototype` until the owner marks it `cleared` |
+| D-016 | Canonical humanoid skeleton | OPEN | Propose one ~22-bone body skeleton, no fingers at first; decide before any rigging ticket |
+| D-017 | Asset budgets (cost caps, regeneration limits, file-size cap) | OPEN | Proposed defaults are in AGENTS.md section 12.4 and 12.7; owner to confirm or change |
 
 ## Change rule
 

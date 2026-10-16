@@ -18,6 +18,7 @@ The game combines:
 - [Design concept](docs/DESIGN.md)
 - [Art bible](docs/ART_BIBLE.md)
 - [Technical architecture](docs/ARCHITECTURE.md)
+- [Asset generation pipeline (proposed)](docs/ASSET_PIPELINE.md)
 - [First 30 minutes](docs/FIRST_30_MINUTES.md)
 - [World and narrative bible](docs/WORLD_BIBLE.md)
 - [Roadmap](docs/ROADMAP.md)
