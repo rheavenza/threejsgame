@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "id": "market-stall",
+  "category": "prop",
+  "style_tokens": ["faceted", "warm-ochre", "handcrafted"],
+  "tri_budget": 1800,
+  "palette": {
+    "timber": "#684A35",
+    "roof": "#D8A34E",
+    "cloth": "#49B8D2"
+  },
+  "ticket": "T00-003",
+  "notes": "Schema-only example. No image or mesh is generated."
+}

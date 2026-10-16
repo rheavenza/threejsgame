@@ -63,17 +63,16 @@ Implement the smallest locally verifiable `assetforge` MCP foundation for valida
 From the repository root:
 
 ```sh
-npm ci
-npm run assetforge:test
-npm run assetforge:validate-sample
-npm run assetforge:smoke
-npm run typecheck
-npm run build
+npm ci --prefix tools/assetforge
+npm --prefix tools/assetforge run check
+npm --prefix tools/assetforge test
+npm --prefix tools/assetforge run validate-sample
+npm --prefix tools/assetforge run smoke
 git diff --check
 codex mcp list
 ```
 
-The smoke command must start and stop the server locally, validate valid/invalid specs, create/query a job, restart and recover it, and validate a sample manifest. It must not call any image/mesh endpoint or require paid credentials.
+The smoke command must start and stop the MCP server implementation locally, validate valid/invalid specs, create/query a job, restart and recover it, and validate a sample manifest. A separate real Codex MCP invocation verifies the configured stdio transport. These checks must not call any image/mesh endpoint or require paid credentials. The base branch currently has no Three.js package/build scripts; browser app checks are not part of this ticket.
 
 ## Limitations and handoff
 
