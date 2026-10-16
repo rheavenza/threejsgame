@@ -42,3 +42,21 @@ These are proposed defaults pending the first implementation ticket.
 GitHub is the source of truth. Implement one ticket at a time on a dedicated branch, commit each meaningful/testable increment, push early, and open or update a pull request at the first useful review stage. Do not silently lock design decisions or expand ticket scope.
 
 See `AGENTS.md` and `docs/WORKFLOW.md` before implementing.
+
+## Run the prototype
+
+Requires Node.js 20.19+ or 22.12+ and npm. From the repository root:
+
+```sh
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite (normally `http://localhost:5173`). To make a
+production build, run:
+
+```sh
+npm run build
+```
+
+To serve the built output locally, run `npm run preview` after the build.
