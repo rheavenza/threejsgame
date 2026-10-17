@@ -45,7 +45,11 @@ See `AGENTS.md` and `docs/WORKFLOW.md` before implementing.
 
 ## Run the prototype
 
-Requires Node.js 20.19+ or 22.12+ and npm. From the repository root:
+Requires Node.js 22.12+ (or another LTS release, such as 24) and npm. Vite alone also
+runs on Node 20.19+, but Vitest 5, which `npm test` uses, does not support Node 20, so
+20.19 is no longer enough for the whole toolchain.
+
+From the repository root:
 
 ```sh
 npm install
