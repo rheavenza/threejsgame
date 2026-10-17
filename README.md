@@ -60,3 +60,10 @@ npm run build
 ```
 
 To serve the built output locally, run `npm run preview` after the build.
+
+To run the unit tests (Vitest), and to typecheck without emitting:
+
+```sh
+npm test
+npm run typecheck
+```

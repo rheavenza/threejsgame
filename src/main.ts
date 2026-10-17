@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import './style.css';
+import { applyViewport, measureViewport } from './viewport';
 
 const canvasHost = document.querySelector<HTMLDivElement>('#app');
 
@@ -172,12 +173,10 @@ for (const [x, z, size, color] of [
 }
 
 function resizeRenderer() {
-  const { width, height } = hostElement.getBoundingClientRect();
-  if (width === 0 || height === 0) return;
+  const size = measureViewport(hostElement);
+  if (!size) return;
 
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(width, height, false);
+  applyViewport(size, camera, renderer);
   renderer.render(scene, camera);
 }
 
