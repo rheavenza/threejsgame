@@ -34,4 +34,18 @@ describe('applyViewport', () => {
 
     expect(camera.aspect).toBeCloseTo(1600 / 900);
   });
+
+  it('refreshes the projection matrix so the aspect change actually takes effect', () => {
+    // `aspect` is a plain property, so setting it alone leaves the projection
+    // matrix stale and the image stretched. Assert on the matrix itself: for a
+    // PerspectiveCamera, elements[5] / elements[0] is the encoded aspect ratio.
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
+    const before = camera.projectionMatrix.clone();
+
+    applyViewport({ width: 1600, height: 900 }, camera, { setSize: vi.fn() });
+
+    expect(camera.projectionMatrix.equals(before)).toBe(false);
+    const encodedAspect = camera.projectionMatrix.elements[5] / camera.projectionMatrix.elements[0];
+    expect(encodedAspect).toBeCloseTo(1600 / 900);
+  });
 });
