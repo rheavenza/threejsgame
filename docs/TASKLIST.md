@@ -14,6 +14,7 @@ Status changes are maintained by the planning/review agent after checking GitHub
 - [x] T00-001 — Minimal Three.js application shell (DONE; merged in PR #2; 3 points).
 - [ ] T00-002 — Pixel-resolution look-dev controls and test scene (READY; 3 points). Was blocked on T00-001 and the reference image; both are resolved.
 - [x] T00-003 — Assetforge skeleton (DONE; merged in PR #4; 3 points; independent infrastructure ticket).
+- [ ] T00-004 — Asset pipeline scaffolding and provider readiness (PROPOSED; 2 points). Paths referenced by AGENTS.md §12.2/§12.7 now exist; no provider adapter is installed yet.
 - [ ] T00-007 — Application shell hardening (PROPOSED; unscheduled, 2 points). Five non-blocking findings from the PR #2 review; not yet on master.
 - [ ] Owner review — accept/revise pixel size, palette balance, lighting, and pixel pipeline.
 
