@@ -1,0 +1,63 @@
+{
+  "$comment": "Deterministic post-processing profile for the asset pipeline. Referenced by AGENTS.md section 12.2 and docs/ASSET_PIPELINE.md section 7. Change only under a ticket that explicitly asks; see AGENTS.md section 12.5.",
+  "schema_version": "1.0",
+  "status": "PROPOSED",
+  "authority": {
+    "palette_source": "docs/ART_BIBLE.md#3-palette",
+    "art_bible": "docs/ART_BIBLE.md",
+    "pipeline": "docs/ASSET_PIPELINE.md"
+  },
+  "units": {
+    "scale_unit": "meter",
+    "forward_axis": "-Z",
+    "up_axis": "Y",
+    "origin": "base-center"
+  },
+  "shading": {
+    "mode": "flat-faceted",
+    "smooth_normals": false,
+    "vertex_colors": false
+  },
+  "palette": {
+    "$comment": "Starting swatches copied from docs/ART_BIBLE.md section 3. Not a locked constant set; quantize to this list unless a ticket adds a justified entry.",
+    "deep_forest": "#205B4D",
+    "emerald": "#25885B",
+    "sunlit_green": "#71B94B",
+    "lime_chartreuse": "#C7D94D",
+    "deep_teal": "#174B4C",
+    "sky_blue": "#62B3F1",
+    "pale_azure": "#A4D9F1",
+    "river_cyan": "#49B8D2",
+    "river_blue": "#347FAF",
+    "warm_ochre": "#D8A34E",
+    "sandy_gold": "#EBC66F",
+    "muted_orange": "#B97843",
+    "warm_bark": "#684A35",
+    "umber": "#47372D",
+    "slate_blue": "#6487B8",
+    "cool_blue_gray": "#536D8F",
+    "cloud_cream": "#F6E8CA",
+    "cloud_shadow": "#B7D6E7"
+  },
+  "budgets": {
+    "$comment": "Tri budgets per category. Ceilings for QA; a ticket may set a tighter value per asset.",
+    "prop": { "tri_budget": 2000, "max_materials": 1, "texture_max_px": 256 },
+    "building": { "tri_budget": 6000, "max_materials": 2, "texture_max_px": 512 },
+    "foliage": { "tri_budget": 1200, "max_materials": 1, "texture_max_px": 256 },
+    "character": { "tri_budget": 8000, "max_materials": 2, "texture_max_px": 512 },
+    "creature": { "tri_budget": 8000, "max_materials": 2, "texture_max_px": 512 }
+  },
+  "texture": {
+    "texel_density_px_per_meter": 32,
+    "filter": "nearest",
+    "mipmaps": false,
+    "format": "png"
+  },
+  "qa": {
+    "required_origin_at_base": true,
+    "require_single_material": true,
+    "max_skin_weights_per_vertex": 4,
+    "reject_non_manifold": true,
+    "file_size_cap_bytes": 5242880
+  }
+}
