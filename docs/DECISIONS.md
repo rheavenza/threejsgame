@@ -23,7 +23,7 @@ This file records decisions and their status so agents do not mistake brainstorm
 | D-007 | World metaphysics | OPEN | Naming may have social, political, or supernatural consequences; no final rule |
 | D-008 | Protagonist history | OPEN | Traveler from outside the town; exact motivation/backstory undecided |
 | D-009 | Full life-sim scope | DEFERRED | Build the foundation first; marriage/adoption are future systems |
-| D-010 | Visual reference file | OPEN | Owner supplied a reference in conversation; copy into repository before visual acceptance can be delegated |
+| D-010 | Visual reference file | LOCKED | `docs/reference/valley-look-reference.png` (1448×1086 PNG, sha256 `5d58991f16c41c61ddc474dc218d9ec58d0daf473be202fd204b28ff52798998`) is the owner-selected valley vista reference. Committed 2026-10-18. Agents may compare look-dev output against this file. |
 | D-011 | Exact pixel resolution | OPEN | Compare several internal resolutions during look-dev |
 | D-012 | Rendering/physics/gameplay libraries | DEFERRED | Select only when a testable ticket needs them |
 | D-013 | Asset generation pipeline | WORKING | Codex-driven, MCP-based pipeline (concept -> mesh -> cleanup -> rig -> motion -> preview -> publish) with owner gates G1/G2; see docs/ASSET_PIPELINE.md. Proposal only; nothing implemented |

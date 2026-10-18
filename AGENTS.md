@@ -125,7 +125,7 @@ For visual milestones, include:
 
 The owner makes the final subjective visual acceptance decision. A screenshot or a passing import test alone does not mean the art gate passed.
 
-The supplied valley reference is not currently stored in the repository. Do not claim an agent has compared its output to the actual image until the reference file is committed or otherwise explicitly provided to the worker.
+The owner-supplied valley reference is committed at `docs/reference/valley-look-reference.png` (D-010 LOCKED). Agents may compare output against that file. It is a painterly reference, not a pixel-art target: the art bible asks for a deliberately more pixelated treatment than the reference itself. Do not claim a comparison you did not actually perform.
 
 ## 9. Verification
 
