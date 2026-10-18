@@ -1,0 +1,3 @@
+# The owner-supplied look reference is a 2 MB PNG. GitHub renders images as
+# binary blobs; -diff stops git from trying to patch-wrap it in review output.
+docs/reference/*.png -diff
