@@ -4,3 +4,4 @@ coverage/
 .vite/
 *.tsbuildinfo
 assets/_work/
+.npm-cache/

@@ -4,6 +4,8 @@
 
 ## 1. Visual north star
 
+The committed reference is [`docs/reference/valley-look-reference.png`](reference/valley-look-reference.png) (1448×1086, D-010 LOCKED). Compare look-dev output against that file directly.
+
 Translate the supplied valley-vista reference into a more clearly pixelated 3D world: a high, sunlit viewpoint over emerald hills and a reflective cyan-blue river, a compact village with warm ochre roofs, bridges and a windmill, distant blue mountain ridges, and an ancient castle perched on a far rocky summit. A lone traveler and a rough wooden sign frame the foreground. Large pixel-clustered clouds fill a brilliant blue sky.
 
 The target should feel like a miniature world painted with chunky pixels and sculpted from simplified 3D forms—not realistic 3D with a generic pixel filter. Preserve depth, perspective, faceted silhouettes, painterly color grouping, and luminous lighting while making pixel clusters more apparent.
@@ -133,4 +135,10 @@ Dungeon darkness should be designed with value grouping and selective warm light
 
 ## 11. Reference asset tracking
 
-The north-star image was supplied in the design conversation. It is **not yet committed as a repository file**. Before an agent makes final art comparisons, add it as docs/art-references/valley-vista-reference.png (or a size-optimized equivalent) in a dedicated, reviewable change. Until then, this written art bible is the operative reference and the owner remains the visual acceptance authority.
+The north-star image is committed at [`docs/reference/valley-look-reference.png`](reference/valley-look-reference.png) and recorded as **LOCKED** in `docs/DECISIONS.md` (D-010).
+
+- Dimensions: 1448×1086 (3:2 area, portrait-friendly framing).
+- Format: 8-bit RGB PNG, 2,007,802 bytes.
+- SHA-256: `5d58991f16c41c61ddc474dc218d9ec58d0daf473be202fd204b28ff52798998`
+
+Agents may now compare look-dev output against this file. Note that the file is a *painterly* reference and is already close to the intended mood; the art bible asks look-dev to push the pixel treatment further than the reference, not to reproduce its brushwork. The owner remains the sole visual acceptance authority, and machine comparisons are evidence, not acceptance.

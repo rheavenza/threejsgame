@@ -1,13 +1,13 @@
 # T00-002 — Pixel Resolution Look-Dev
 
-**Status:** BLOCKED on T00-001 and owner visual reference check-in  
+**Status:** READY — T00-001 is merged (PR #2) and the reference image is committed (D-010 LOCKED), so both former blockers are cleared.  
 **Sprint:** 0 — Browser shell and visual proof  
 **Points:** 3  
 **Worker:** Codex  
 **Base branch:** master  
 **Worker branch:** work/T00-002-pixel-lookdev-codex  
 **PR target:** master  
-**Depends on:** T00-001; owner-provided reference asset must be present for final visual comparison
+**Depends on:** T00-001 (merged). Reference for comparison: `docs/reference/valley-look-reference.png`
 
 ## Objective
 
