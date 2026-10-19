@@ -1,0 +1,30 @@
+{
+  "capturedAt": "2026-10-19T10:35:54.050Z",
+  "browser": "chromium (playwright)",
+  "viewport": "1280x720",
+  "deviceScaleFactor": 1,
+  "consoleErrors": [],
+  "results": [
+    {
+      "preset": "320x180",
+      "internalResolution": "320x180",
+      "upscale": 4,
+      "viewport": "1280x720",
+      "file": "/var/home/rhea/workspace/threejsgame/docs/evidence/T00-002/valley-320x180.png"
+    },
+    {
+      "preset": "426x240",
+      "internalResolution": "427x240",
+      "upscale": 2,
+      "viewport": "1280x720",
+      "file": "/var/home/rhea/workspace/threejsgame/docs/evidence/T00-002/valley-426x240.png"
+    },
+    {
+      "preset": "480x270",
+      "internalResolution": "480x270",
+      "upscale": 2,
+      "viewport": "1280x720",
+      "file": "/var/home/rhea/workspace/threejsgame/docs/evidence/T00-002/valley-480x270.png"
+    }
+  ]
+}
