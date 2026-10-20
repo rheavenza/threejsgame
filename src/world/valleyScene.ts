@@ -124,18 +124,29 @@ function cloud(x: number, y: number, z: number, scale: number): THREE.Group {
   const group = new THREE.Group();
   const rand = makeRandom(Math.round(x * 13 + y * 7 + z * 3) + 99);
 
-  const blocks = 7;
+  const blocks = 9;
   for (let i = 0; i < blocks; i += 1) {
     const t = i / (blocks - 1);
-    const w = 3.4 * scale * (1 - Math.abs(t - 0.5) * 0.9) * (0.8 + rand() * 0.5);
-    const h = 1.5 * scale * (0.7 + rand() * 0.6);
-    const d = 1.6 * scale * (0.7 + rand() * 0.5);
+    const w = 3.6 * scale * (1 - Math.abs(t - 0.5) * 0.85) * (0.85 + rand() * 0.4);
+    const h = 1.8 * scale * (0.75 + rand() * 0.55);
+    const d = 1.8 * scale * (0.75 + rand() * 0.45);
+    // Bright cream tops with cool shadowed undersides, as the art bible asks.
     const bright = i % 2 === 0;
     group.add(
       mesh(
         geo(new THREE.BoxGeometry(w, h, d)),
-        mat(facet(bright ? PALETTE.cloudCream : PALETTE.cloudShadow)),
-        [(t - 0.5) * 6 * scale, (rand() - 0.3) * 0.7 * scale, 0],
+        mat(
+          new THREE.MeshStandardMaterial({
+            color: bright ? '#FFFDF2' : PALETTE.cloudShadow,
+            roughness: 1,
+            // Clouds are lit by the sky rather than by hard shadowing, so they
+            // stay luminous instead of picking up dark cast shadow.
+            flatShading: true,
+            emissive: new THREE.Color(bright ? '#FFF6DC' : '#8FB6CE'),
+            emissiveIntensity: bright ? 0.42 : 0.2,
+          }),
+        ),
+        [(t - 0.5) * 6.4 * scale, (rand() - 0.25) * 0.9 * scale, (rand() - 0.5) * 1.2 * scale],
       ),
     );
   }
@@ -183,27 +194,34 @@ function fence(
 /** The distant castle: one memorable skyline landmark (ART_BIBLE.md §4.4). */
 function castle(x: number, y: number, z: number, scale: number): THREE.Group {
   const group = new THREE.Group();
-  const stone = mat(facet(PALETTE.slateBlue));
+  // A deeper slate than the surrounding crag so the keep separates from the
+  // rock it stands on instead of dissolving into it.
+  const stone = mat(facet('#4A6A96'));
 
-  const keep = mesh(geo(new THREE.BoxGeometry(2.4, 3.2, 2.0)), stone, [0, 1.6, 0]);
+  const keep = mesh(geo(new THREE.BoxGeometry(3.0, 4.0, 2.6)), stone, [0, 2.0, 0]);
   group.add(keep);
 
-  // Stepped towers; the tallest offsets the silhouette from a plain block.
+  // Stepped towers; varying heights keep the silhouette from reading as a box.
   const towers: Array<[number, number, number, number]> = [
-    [-1.7, 0, 0, 4.4],
-    [1.7, 0, 0.2, 3.6],
-    [0.2, 0, -1.2, 5.2],
+    [-2.1, 0, 0, 5.6],
+    [2.1, 0, 0.3, 4.4],
+    [0.2, 0, -1.5, 6.6],
+    [-0.4, 0, 1.6, 3.4],
   ];
   for (const [tx, , tz, th] of towers) {
-    group.add(mesh(geo(new THREE.BoxGeometry(1.0, th, 1.0)), stone, [tx, th / 2, tz]));
+    group.add(mesh(geo(new THREE.BoxGeometry(1.2, th, 1.2)), stone, [tx, th / 2, tz]));
     group.add(
-      mesh(geo(new THREE.ConeGeometry(0.85, 0.9, 4)), mat(facet(PALETTE.coolBlueGray)), [
+      mesh(geo(new THREE.ConeGeometry(1.0, 1.2, 4)), mat(facet('#3D5C86')), [
         tx,
-        th + 0.45,
+        th + 0.6,
         tz,
       ]),
     );
   }
+
+  // A connecting curtain wall ties the towers into one mass.
+  group.add(mesh(geo(new THREE.BoxGeometry(4.6, 1.8, 0.8)), stone, [0, 0.9, 0.9]));
+  group.add(mesh(geo(new THREE.BoxGeometry(0.8, 1.8, 3.2)), stone, [0, 0.9, -0.6]));
 
   group.position.set(x, y, z);
   group.scale.setScalar(scale);
@@ -351,18 +369,21 @@ export function buildValleyScene(): ValleyScene {
   camera.position.set(-2.5, 7, 26);
   camera.lookAt(2, 6, -40);
 
-  // Warm key light from the upper left, matching the reference's sun.
-  const sun = new THREE.DirectionalLight('#FFF3D0', 2.9);
-  sun.position.set(-22, 30, 18);
+  // Warm key light from the upper left, matching the reference's sun. The light
+  // is positioned high and far so its direction is nearly constant across the
+  // valley and the shadow frustum can cover the whole visible scene.
+  const sun = new THREE.DirectionalLight('#FFF3D0', 3.1);
+  sun.position.set(-48, 62, 40);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   sun.shadow.camera.near = 1;
-  sun.shadow.camera.far = 140;
-  sun.shadow.camera.left = -46;
-  sun.shadow.camera.right = 46;
-  sun.shadow.camera.top = 46;
-  sun.shadow.camera.bottom = -34;
-  sun.shadow.normalBias = 0.08;
+  sun.shadow.camera.far = 260;
+  sun.shadow.camera.left = -90;
+  sun.shadow.camera.right = 90;
+  sun.shadow.camera.top = 90;
+  sun.shadow.camera.bottom = -60;
+  sun.shadow.normalBias = 0.12;
+  sun.shadow.bias = -0.0006;
   scene.add(sun);
 
   // Sky/ground ambient keeps shadow interiors cool and legible.
@@ -381,11 +402,17 @@ export function buildValleyScene(): ValleyScene {
   // Kept behind the fog start so they read as soft atmospheric silhouettes and
   // never dominate the composition (ART_BIBLE.md §3 "distant terrain loses
   // contrast", §7 "layered distant landmarks").
-  scene.add(ridge(-78, -190, 86, 40, 34, PALETTE.slateBlue));
-  scene.add(ridge(84, -200, 92, 46, 38, PALETTE.slateBlue));
+  // Layered ridges: four staggered depth planes, each greener and more
+  // contrasted than the one behind it, so the valley reads as receding space
+  // rather than a single backdrop (ART_BIBLE.md §4.5).
+  scene.add(ridge(-40, -140, 58, 22, 26, '#4E8F63'));
+  scene.add(ridge(52, -148, 62, 24, 28, '#57996A'));
+  // A closer, fully saturated hill mass behind the village.
+  scene.add(ridge(-64, -96, 46, 18, 22, '#3F8A57'));
+  scene.add(ridge(72, -102, 50, 20, 24, '#468F5D'));
+  scene.add(ridge(-78, -190, 86, 40, 34, '#6C97A8'));
+  scene.add(ridge(84, -200, 92, 46, 38, '#6C97A8'));
   scene.add(ridge(0, -240, 110, 42, 40, PALETTE.coolBlueGray));
-  scene.add(ridge(-40, -140, 58, 22, 26, '#6F9B86'));
-  scene.add(ridge(52, -148, 62, 24, 28, '#77A183'));
 
   // --- Water: broad calm shapes with a distinct shore boundary --------------
   // A wide river/lake band sitting between the near bank and the village. It is
@@ -502,40 +529,43 @@ export function buildValleyScene(): ValleyScene {
 
   // --- Foreground frame: canopy at the left edge, oversized and close ------
   // A near tree whose canopy clips the top-left corner is what makes the shot
-  // feel framed rather than merely observed (ART_BIBLE.md §4.1).
+  // feel framed rather than merely observed (ART_BIBLE.md §4.1). The trunk is
+  // kept thin and off to the left so it frames without blocking the valley.
   const frameRand = makeRandom(4242);
   const frameTree = new THREE.Group();
   const trunk = mesh(
-    geo(new THREE.CylinderGeometry(0.9, 1.3, 22, 6)),
+    geo(new THREE.CylinderGeometry(0.32, 0.5, 13, 6)),
     mat(facet(PALETTE.warmBark)),
-    [0, 8.5, 0],
+    [0, 6, 0],
   );
-  trunk.rotation.z = 0.08;
+  trunk.rotation.z = 0.1;
   const frameCanopy = new THREE.Group();
-  for (let i = 0; i < 7; i += 1) {
-    const size = 5 + frameRand() * 3.4;
+  for (let i = 0; i < 8; i += 1) {
+    const size = 4.4 + frameRand() * 3.0;
     const clump = mesh(
       geo(new THREE.IcosahedronGeometry(size, 0)),
       mat(facet(i % 3 === 0 ? PALETTE.emerald : PALETTE.deepForest)),
       [
-        (frameRand() - 0.35) * 17,
-        19 + (frameRand() - 0.4) * 6,
-        (frameRand() - 0.5) * 13,
+        (frameRand() - 0.3) * 20,
+        13 + (frameRand() - 0.4) * 6,
+        (frameRand() - 0.5) * 15,
       ],
     );
     frameCanopy.add(clump);
   }
   frameTree.add(trunk, frameCanopy);
-  // Positioned just off the left edge of frame so the canopy overhangs the
-  // corner without covering the valley.
-  frameTree.position.set(-30, 0, 16);
+  // The canopy must sit within a few units of the camera to enter the frame at
+  // all: at this FOV a tree much further back or further left falls entirely
+  // outside the frustum. Placed so the clumps overhang the upper-left corner.
+  frameTree.position.set(-16.5, 0, 7);
+  frameTree.scale.setScalar(0.55);
   scene.add(frameTree);
 
   // A second, smaller tree on the right keeps the frame balanced.
   scene.add(tree(30, 4, 8.5, PALETTE.emerald));
   scene.add(tree(-40, -20, 7, PALETTE.deepForest));
 
-  scene.add(signpost(-15, 12));
+  scene.add(signpost(-8.5, 4));
 
   const rockSpecs: Array<[number, number, number, string]> = [
     [-9.5, 17, 1.8, '#B9A87E'],
@@ -577,19 +607,24 @@ export function buildValleyScene(): ValleyScene {
   );
 
   // --- Sky: large stepped cloud masses, built from stacked boxes -----------
-  scene.add(cloud(-46, 46, -120, 6.5));
-  scene.add(cloud(-14, 54, -150, 8.0));
-  scene.add(cloud(26, 48, -128, 6.8));
-  scene.add(cloud(62, 52, -160, 6.0));
-  scene.add(cloud(-76, 50, -164, 5.4));
-  scene.add(cloud(6, 66, -190, 7.2));
+  // High and far, so they sit in the upper sky as a band rather than crowding
+  // down over the valley.
+  scene.add(cloud(-52, 58, -150, 6.0));
+  scene.add(cloud(-16, 68, -180, 7.4));
+  scene.add(cloud(28, 60, -158, 6.2));
+  scene.add(cloud(68, 64, -190, 5.6));
+  scene.add(cloud(-86, 62, -190, 5.0));
+  scene.add(cloud(8, 82, -220, 6.6));
 
   // --- The distant adventure landmark --------------------------------------
   // A broad, low summit crag with the castle on top. The crag is wide and flat
   // rather than tall, so it reads as a rock plateau instead of a boulder that
   // blocks the valley behind it.
-  scene.add(ridge(46, -178, 52, 20, 34, PALETTE.coolBlueGray));
-  scene.add(castle(46, 17, -178, 5.2));
+  scene.add(ridge(46, -172, 54, 21, 34, PALETTE.coolBlueGray));
+  // Pulled closer than the outermost ridges so fog leaves it a legible
+  // silhouette rather than dissolving it into the sky (ART_BIBLE.md §7: the
+  // castle "must remain a recognizable silhouette").
+  scene.add(castle(46, 18, -172, 6.0));
 
   return {
     scene,
