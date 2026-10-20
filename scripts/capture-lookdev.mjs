@@ -11,7 +11,7 @@
  */
 import { chromium } from 'playwright';
 import { createServer } from 'vite';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -83,16 +83,102 @@ async function main() {
     const meta = await page.evaluate(() => ({
       preset: document.body.dataset.preset,
       internalResolution: document.body.dataset.internalResolution,
+      displayResolution: document.body.dataset.displayResolution,
       upscale: Number(document.body.dataset.upscale),
+      effectiveScale: Number(document.body.dataset.effectiveScale),
+      letterbox: document.body.dataset.letterbox,
     }));
 
     const file = resolve(outDir, `valley-${preset}.png`);
     await page.screenshot({ path: file });
 
-    results.push({ ...meta, viewport: `${args.width}x${args.height}`, file });
-    console.log(
-      `captured ${preset}: internal ${meta.internalResolution} x${meta.upscale} -> ${file}`,
+    // Independently measure the presented scale from the captured image rather
+    // than trusting the computed value. Reading the WebGL canvas back in-page
+    // returns transparent pixels (the drawing buffer is not preserved), so we
+    // decode the screenshot we just wrote instead.
+    const measured = await page.evaluate(
+      async ({ pngBase64, inset }) => {
+        const img = new Image();
+        img.src = `data:image/png;base64,${pngBase64}`;
+        await img.decode();
+        const off = document.createElement('canvas');
+        off.width = img.width;
+        off.height = img.height;
+        const ctx = off.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const { data } = ctx.getImageData(0, 0, off.width, off.height);
+        const at = (x, y) => {
+          const i = (y * off.width + x) * 4;
+          return (data[i] << 16) | (data[i + 1] << 8) | data[i + 2];
+        };
+
+        // Measure only inside the drawn image area: the letterbox bars are a
+        // flat fill, and the HTML overlay labels sit in the upper-left, so both
+        // are excluded to avoid stray 1px edges defeating the measurement.
+        const x0 = inset.x;
+        const x1 = off.width - inset.x;
+        const y0 = Math.max(inset.y, Math.floor(off.height * 0.55));
+        const y1 = Math.min(off.height - inset.y, Math.floor(off.height * 0.72));
+
+        // A nearest-neighbour upscale by N makes every horizontal run an exact
+        // multiple of N, so the greatest common divisor of the observed runs
+        // recovers the true pixel size even where rows are flat.
+        const runs = [];
+        for (let y = y0; y < y1; y += 1) {
+          let runStart = x0;
+          let last = at(x0, y);
+          for (let x = x0 + 1; x < x1; x += 1) {
+            const c = at(x, y);
+            if (c !== last) {
+              runs.push(x - runStart);
+              runStart = x;
+              last = c;
+            }
+          }
+          runs.push(x1 - runStart);
+        }
+
+        const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+        const usable = runs.filter((r) => r > 1 && r < x1 - x0);
+        return {
+          canvasWidth: off.width,
+          canvasHeight: off.height,
+          transitions: usable.length,
+          measuredScale: usable.length ? usable.reduce((a, b) => gcd(a, b)) : 0,
+        };
+      },
+      {
+        pngBase64: (await readFile(file)).toString('base64'),
+        inset: {
+          x: Math.ceil(Number(meta.letterbox.split('x')[0]) / 2),
+          y: Math.ceil(Number(meta.letterbox.split('x')[1]) / 2),
+        },
+      },
     );
+
+    const measuredScale = measured.measuredScale;
+    const scaleMatches = measuredScale === meta.effectiveScale;
+
+    results.push({
+      ...meta,
+      viewport: `${args.width}x${args.height}`,
+      measuredCanvas: `${measured.canvasWidth}x${measured.canvasHeight}`,
+      measuredScale,
+      scaleVerified: scaleMatches,
+      file,
+    });
+    console.log(
+      `captured ${preset}: internal ${meta.internalResolution} -> shown ${meta.displayResolution} ` +
+        `(reported x${meta.effectiveScale}, letterbox ${meta.letterbox})` +
+        ` measured x${measuredScale} ${scaleMatches ? 'OK' : 'MISMATCH'} -> ${file}`,
+    );
+
+    if (!scaleMatches) {
+      console.error(
+        `FAIL: ${preset} reported x${meta.effectiveScale} but the canvas presents x${measuredScale}.`,
+      );
+      process.exitCode = 1;
+    }
   }
 
   await browser.close();

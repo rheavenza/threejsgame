@@ -540,15 +540,19 @@ export function buildValleyScene(): ValleyScene {
   );
   trunk.rotation.z = 0.1;
   const frameCanopy = new THREE.Group();
-  for (let i = 0; i < 8; i += 1) {
-    const size = 4.4 + frameRand() * 3.0;
+  // Fewer, smaller, and lifted clumps: an earlier version produced a single
+  // dark mass covering the left third of the frame, which buried the valley
+  // the frame is supposed to reveal (owner review, PR #5).
+  for (let i = 0; i < 6; i += 1) {
+    const size = 2.6 + frameRand() * 1.7;
     const clump = mesh(
       geo(new THREE.IcosahedronGeometry(size, 0)),
-      mat(facet(i % 3 === 0 ? PALETTE.emerald : PALETTE.deepForest)),
+      // Lighter greens only: deep forest here read as a black silhouette hole.
+      mat(facet(i % 3 === 0 ? PALETTE.emerald : '#2E7A55')),
       [
-        (frameRand() - 0.3) * 20,
-        13 + (frameRand() - 0.4) * 6,
-        (frameRand() - 0.5) * 15,
+        (frameRand() - 0.55) * 13,
+        15 + (frameRand() - 0.3) * 4,
+        (frameRand() - 0.5) * 11,
       ],
     );
     frameCanopy.add(clump);
@@ -621,6 +625,9 @@ export function buildValleyScene(): ValleyScene {
   // rather than tall, so it reads as a rock plateau instead of a boulder that
   // blocks the valley behind it.
   scene.add(ridge(46, -172, 54, 21, 34, PALETTE.coolBlueGray));
+  // A paler ridge directly behind the castle so the dark silhouette separates
+  // by value instead of blending into the mid-green hills (owner review, PR #5).
+  scene.add(ridge(52, -206, 46, 30, 26, '#8FB0C4'));
   // Pulled closer than the outermost ridges so fog leaves it a legible
   // silhouette rather than dissolving it into the sky (ART_BIBLE.md §7: the
   // castle "must remain a recognizable silhouette").

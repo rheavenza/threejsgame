@@ -111,6 +111,57 @@ describe('resolvePixelLayout', () => {
       target: { width: 0, height: 0 },
       scale: 0,
       display: { width: 0, height: 0 },
+      letterbox: { width: 0, height: 0 },
+      effectiveScale: { x: 0, y: 0 },
     });
+  });
+
+  // Regression: the present pass originally stretched the target across the
+  // whole framebuffer, so the *reported* integer scale disagreed with what was
+  // actually on screen (427 -> 1280 is an effective x3, not x2). These lock the
+  // invariant that makes the reported number trustworthy.
+  it('reports an effective scale that matches the integer scale', () => {
+    for (const viewport of [
+      { width: 1280, height: 720 },
+      { width: 1600, height: 900 },
+      { width: 1024, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      for (const candidate of PIXEL_PRESETS) {
+        const layout = resolvePixelLayout(candidate, viewport);
+        expect(layout.effectiveScale.x).toBe(layout.scale);
+        expect(layout.effectiveScale.y).toBe(layout.scale);
+      }
+    }
+  });
+
+  it('never lets the display box exceed the viewport', () => {
+    for (const viewport of [
+      { width: 1280, height: 720 },
+      { width: 1024, height: 768 },
+      { width: 800, height: 600 },
+    ]) {
+      for (const candidate of PIXEL_PRESETS) {
+        const { display, letterbox } = resolvePixelLayout(candidate, viewport);
+        expect(display.width).toBeLessThanOrEqual(viewport.width);
+        expect(display.height).toBeLessThanOrEqual(viewport.height);
+        expect(letterbox.width).toBeGreaterThanOrEqual(0);
+        expect(letterbox.height).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
+  it('accounts for every viewport pixel as either drawn or letterboxed', () => {
+    const viewport = { width: 1280, height: 720 };
+    const { display, letterbox } = resolvePixelLayout(preset, viewport);
+    expect(display.width + letterbox.width).toBe(viewport.width);
+    expect(display.height + letterbox.height).toBe(viewport.height);
+  });
+
+  it('leaves no letterbox on the axis the target fills exactly', () => {
+    // 320x180 at 1280x720 is a clean x4 on both axes.
+    const layout = resolvePixelLayout(findPreset('320x180'), { width: 1280, height: 720 });
+    expect(layout.letterbox).toEqual({ width: 0, height: 0 });
+    expect(layout.scale).toBe(4);
   });
 });

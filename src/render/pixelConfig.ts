@@ -57,21 +57,42 @@ export interface PixelLayout {
   readonly target: ViewportSize;
   /** Integer nearest-neighbour upscale factor applied to the target. */
   readonly scale: number;
-  /** On-screen size of the upscaled image, in CSS pixels. */
+  /** On-screen size of the upscaled image, in device pixels. */
   readonly display: ViewportSize;
+  /**
+   * Letterbox bars left by integer scaling, in device pixels. Zero on an axis
+   * the image fills exactly. These are real pixels the pipeline never draws
+   * into, so they must be reported rather than hidden.
+   */
+  readonly letterbox: ViewportSize;
+  /**
+   * The scale actually applied to the target on screen. It always equals
+   * `scale`, because the present pass draws into `display` and never stretches
+   * across the whole framebuffer. Exposed so evidence can state a measured
+   * value rather than an assumed one.
+   */
+  readonly effectiveScale: { readonly x: number; readonly y: number };
 }
+
+const EMPTY_LAYOUT: PixelLayout = {
+  target: { width: 0, height: 0 },
+  scale: 0,
+  display: { width: 0, height: 0 },
+  letterbox: { width: 0, height: 0 },
+  effectiveScale: { x: 0, y: 0 },
+};
 
 /**
  * Resolves the internal render size and the upscale factor for a viewport.
  *
  * The internal aspect ratio always matches the viewport, so the world is never
- * stretched; the preset only sets the pixel *density*. When the viewport is
- * smaller than one whole preset copy (scale 0), the render falls back to the
- * viewport size at scale 1 so the scene still fills the frame.
+ * stretched; the preset only sets the pixel *density*. The result carries the
+ * letterbox bars so the caller can present the target in exactly `display`
+ * device pixels and leave the remainder undrawn.
  */
 export function resolvePixelLayout(preset: PixelPreset, viewport: ViewportSize): PixelLayout {
   if (viewport.width <= 0 || viewport.height <= 0) {
-    return { target: { width: 0, height: 0 }, scale: 0, display: { width: 0, height: 0 } };
+    return EMPTY_LAYOUT;
   }
 
   const aspect = viewport.width / viewport.height;
@@ -95,9 +116,19 @@ export function resolvePixelLayout(preset: PixelPreset, viewport: ViewportSize):
   // Floor at 1 so a tiny viewport still draws something rather than nothing.
   const scale = Math.max(1, integerScaleFor(target, viewport));
 
+  const display = { width: target.width * scale, height: target.height * scale };
+
   return {
     target,
     scale,
-    display: { width: target.width * scale, height: target.height * scale },
+    display,
+    letterbox: {
+      width: Math.max(0, viewport.width - display.width),
+      height: Math.max(0, viewport.height - display.height),
+    },
+    effectiveScale: {
+      x: target.width > 0 ? display.width / target.width : 0,
+      y: target.height > 0 ? display.height / target.height : 0,
+    },
   };
 }

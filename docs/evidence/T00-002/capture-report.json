@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-20T07:53:33.728Z",
+  "capturedAt": "2026-10-20T13:04:02.166Z",
   "browser": "chromium (playwright)",
   "viewport": "1280x720",
   "deviceScaleFactor": 1,
@@ -8,22 +8,40 @@
     {
       "preset": "320x180",
       "internalResolution": "320x180",
+      "displayResolution": "1280x720",
       "upscale": 4,
+      "effectiveScale": 4,
+      "letterbox": "0x0",
       "viewport": "1280x720",
+      "measuredCanvas": "1280x720",
+      "measuredScale": 4,
+      "scaleVerified": true,
       "file": "/var/home/rhea/workspace/threejsgame/docs/evidence/T00-002/valley-320x180.png"
     },
     {
       "preset": "426x240",
       "internalResolution": "427x240",
+      "displayResolution": "854x480",
       "upscale": 2,
+      "effectiveScale": 2,
+      "letterbox": "426x240",
       "viewport": "1280x720",
+      "measuredCanvas": "1280x720",
+      "measuredScale": 2,
+      "scaleVerified": true,
       "file": "/var/home/rhea/workspace/threejsgame/docs/evidence/T00-002/valley-426x240.png"
     },
     {
       "preset": "480x270",
       "internalResolution": "480x270",
+      "displayResolution": "960x540",
       "upscale": 2,
+      "effectiveScale": 2,
+      "letterbox": "320x180",
       "viewport": "1280x720",
+      "measuredCanvas": "1280x720",
+      "measuredScale": 2,
+      "scaleVerified": true,
       "file": "/var/home/rhea/workspace/threejsgame/docs/evidence/T00-002/valley-480x270.png"
     }
   ]

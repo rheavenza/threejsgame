@@ -54,7 +54,11 @@ function updatePresetReadout(): void {
   const layout = pipeline.getLayout();
   if (presetLabel) {
     const preset = pipeline.getPreset();
-    presetLabel.textContent = `${preset.id} · internal ${layout.target.width}×${layout.target.height} · ×${layout.scale}`;
+    const box =
+      layout.letterbox.width > 0 || layout.letterbox.height > 0
+        ? ` · letterbox ${layout.letterbox.width}×${layout.letterbox.height}`
+        : '';
+    presetLabel.textContent = `${preset.id} · internal ${layout.target.width}×${layout.target.height} · shown ${layout.display.width}×${layout.display.height} · ×${layout.scale}${box}`;
   }
   for (const button of presetButtons) {
     button.setAttribute(
@@ -62,10 +66,15 @@ function updatePresetReadout(): void {
       String(button.dataset.preset === pipeline.getPreset().id),
     );
   }
-  // Exposed for headless capture and manual inspection.
+  // Exposed for headless capture and manual inspection. `upscale` is the scale
+  // actually applied on screen, which equals the integer scale because the
+  // present pass draws into the display rectangle instead of stretching.
   document.body.dataset.preset = pipeline.getPreset().id;
   document.body.dataset.internalResolution = `${layout.target.width}x${layout.target.height}`;
+  document.body.dataset.displayResolution = `${layout.display.width}x${layout.display.height}`;
   document.body.dataset.upscale = String(layout.scale);
+  document.body.dataset.effectiveScale = layout.effectiveScale.x.toFixed(3);
+  document.body.dataset.letterbox = `${layout.letterbox.width}x${layout.letterbox.height}`;
 }
 
 for (const button of presetButtons) {
