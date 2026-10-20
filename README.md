@@ -98,3 +98,39 @@ Output goes to `docs/evidence/T00-002/`. See [docs/LOOKDEV_NOTES.md](docs/LOOKDE
 for the pipeline notes, the resolution trade-offs, and the known gaps against the
 reference image.
 
+### Shell smoke test
+
+To exercise the application shell headlessly — normal startup, a browser with no
+WebGL, a WebGL-1-only browser, context loss and restore, and resize — and fail on
+any uncaught error:
+
+```sh
+npm run smoke
+```
+
+Output and screenshots go to `docs/evidence/T00-007/`.
+
+### When the scene cannot render
+
+The scene requires **WebGL 2**: three.js 0.180.0 requests a `webgl2` context and
+has no WebGL 1 fallback. A browser that cannot provide one gets a short
+explanation instead of a blank page — the canvas is not appended and no uncaught
+error is thrown. If the GPU context is lost while the page is open, rendering
+pauses, a console warning is logged, and the scene redraws automatically once
+the browser restores the context.
+
+```mermaid
+flowchart TD
+  A[Load page] --> B{WebGL 2 available?}
+  B -- No --> C[Show "could not be drawn" notice]
+  B -- Yes --> D[Create renderer and pipeline]
+  D --> E[Observe host size]
+  E --> F[Render frame]
+  F --> G{Context lost?}
+  G -- Yes --> H[Pause drawing, warn]
+  H --> I[Browser restores context]
+  I --> J[Rebuild target, redraw]
+  J --> F
+```
+
+

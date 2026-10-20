@@ -129,6 +129,45 @@ body {
   color: #40685f;
 }
 
+/* Shown when the renderer cannot start (no WebGL, or context creation failed)
+   so the player sees an explanation instead of an unexplained empty page. */
+.renderer-notice {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 32px;
+  text-align: center;
+  background: linear-gradient(180deg, #10333a 0%, #0b2429 100%);
+}
+
+.renderer-notice__title {
+  margin: 0;
+  max-width: 30ch;
+  color: #eaf7f2;
+  font-size: clamp(18px, 2.4vw, 26px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.renderer-notice__body {
+  margin: 0;
+  max-width: 54ch;
+  color: #a8cbc6;
+  font-size: clamp(13px, 1.3vw, 15px);
+  line-height: 1.6;
+}
+
+/* With no renderer, the scene chrome and the resolution switcher are inert;
+   hide them so the failure message is the only thing to read. */
+.scene-shell:has(.renderer-notice) .scene-label,
+.scene-shell:has(.renderer-notice) .lookdev {
+  display: none;
+}
+
 @media (max-width: 560px) {
   .scene-label {
     top: 20px;
