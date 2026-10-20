@@ -71,3 +71,30 @@ To run the unit tests (Vitest), and to typecheck without emitting:
 npm test
 npm run typecheck
 ```
+
+### Look-dev controls
+
+The scene renders through a low-resolution pixel pipeline. Switch the internal
+resolution with the on-screen control, or with a query parameter:
+
+```
+http://localhost:5173/?res=320x180
+http://localhost:5173/?res=426x240
+http://localhost:5173/?res=480x270
+```
+
+The internal size is derived from the viewport, so it changes with the window
+while the upscale stays a whole-number nearest-neighbour expansion. The current
+internal resolution and upscale factor are shown in the panel.
+
+To capture screenshot evidence headlessly (Chromium via Playwright) at every
+preset, and to fail on any console error:
+
+```sh
+npm run capture
+```
+
+Output goes to `docs/evidence/T00-002/`. See [docs/LOOKDEV_NOTES.md](docs/LOOKDEV_NOTES.md)
+for the pipeline notes, the resolution trade-offs, and the known gaps against the
+reference image.
+

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#a9dafa" />
+    <meta name="theme-color" content="#62b3f1" />
     <link rel="icon" href="data:," />
     <meta
       name="description"
@@ -13,18 +13,25 @@
   </head>
   <body>
     <main class="scene-shell" aria-label="Three.js valley scene preview">
-      <div class="scene-label" aria-hidden="true">
-        <span class="scene-label__eyebrow">FIELD NOTES · 001</span>
-        <span class="scene-label__title">A place to begin</span>
-      </div>
-      <div class="scene-status" aria-hidden="true">
-        <span class="scene-status__dot"></span>
-        <span>SCENE PREVIEW</span>
-      </div>
       <div id="app" class="canvas-host"></div>
+
+      <header class="scene-label">
+        <span class="scene-label__eyebrow">FIELD NOTES · 002</span>
+        <span class="scene-label__title">The valley from the ridge road</span>
+      </header>
+
+      <div class="lookdev" role="group" aria-label="Look-dev internal resolution">
+        <span class="lookdev__legend">INTERNAL RES</span>
+        <div class="lookdev__options">
+          <button type="button" class="lookdev__button" data-preset="320x180">320×180</button>
+          <button type="button" data-preset="426x240" class="lookdev__button">426×240</button>
+          <button type="button" data-preset="480x270" class="lookdev__button">480×270</button>
+        </div>
+        <span id="preset-label" class="lookdev__readout">—</span>
+      </div>
+
       <noscript>This scene needs JavaScript enabled to render.</noscript>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
-
