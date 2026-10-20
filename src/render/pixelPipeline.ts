@@ -64,6 +64,21 @@ export class PixelPipeline {
     this.renderTarget = null;
   }
 
+  /**
+   * Drops the render target so the next `resize()` rebuilds it.
+   *
+   * Called after a WebGL context restore: the GPU-side texture did not survive
+   * the context loss, so reusing it would render nothing.
+   */
+  invalidateRenderTarget(): void {
+    this.renderTarget?.dispose();
+    this.renderTarget = null;
+    // Reset the cached layout too: `resize()` only rebuilds the target when the
+    // requested size differs from the previous one, so leaving the old size
+    // cached would skip the rebuild entirely.
+    this.layout = resolvePixelLayout(EMPTY_PRESET, { width: 0, height: 0 });
+  }
+
   /** Recomputes the internal render size for a new viewport. */
   resize(viewport: ViewportSize): PixelLayout {
     const layout = resolvePixelLayout(this.preset, viewport);
