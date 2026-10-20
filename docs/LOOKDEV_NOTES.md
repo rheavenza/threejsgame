@@ -30,14 +30,28 @@ world is never stretched by the preset choice. The upscale factor is always a
 whole number; a fractional factor would place source pixels across partial
 destination pixels and produce uneven, shimmering clusters.
 
-Measured behaviour (headless Chromium, `deviceScaleFactor: 1`):
+The present pass draws the target into exactly that integer-scaled rectangle and
+letterboxes the remainder in a neutral dark. It does **not** stretch the target
+across the framebuffer — doing so would apply a fractional effective scale and
+make the reported number a lie. The capture tool measures the presented scale
+from the rendered pixels and fails if it disagrees with the reported value.
 
-| Viewport | Preset | Internal target | Upscale |
-|---|---|---|---|
-| 1280×720 | 426×240 | 427×240 | ×2 |
-| 1280×720 | 320×180 | 320×180 | ×4 |
-| 1600×900 | 320×180 | 320×180 | ×5 |
-| 1024×768 (4:3) | 320×180 | 277×208 | ×3 |
+Measured behaviour (headless Chromium, `deviceScaleFactor: 1`, 1280×720
+viewport). "Measured" is recovered from the screenshot by taking the greatest
+common divisor of horizontal run lengths inside the drawn area:
+
+| Preset | Internal target | Display box | Letterbox | Reported | Measured |
+|---|---|---|---|---|---|
+| 320×180 | 320×180 | 1280×720 | 0×0 | ×4 | **×4** |
+| 426×240 | 427×240 | 854×480 | 426×240 | ×2 | **×2** |
+| 480×270 | 480×270 | 960×540 | 320×180 | ×2 | **×2** |
+
+Resizing re-derives the target and keeps the scale integral:
+
+| Viewport | Preset | Internal target | Display box | Scale |
+|---|---|---|---|---|
+| 1600×900 | 320×180 | 320×180 | 1600×900 | ×5 |
+| 1024×768 (4:3) | 320×180 | 277×208 | 831×624 | ×3 |
 
 Changing the preset leaves the CSS layout untouched (canvas stays 1280×720 in
 all cases), satisfying "internal resolution can be changed without changing
@@ -112,16 +126,18 @@ owner's decision, and the switcher remains in the build either way.
 
 ## 6. Known technical limitations
 
-- Upscale is integer-only. At viewport sizes where the target fits fewer than two
-  whole times, the image is upscaled ×1 and does not fill the viewport
-  edge-to-edge. The `display` box is reported in the layout so a future ticket can
-  letterbox deliberately instead.
+- Integer scaling leaves letterbox bars whenever the viewport is not an exact
+  multiple of the internal size. That is the honest cost of a whole-number
+  upscale; the bars are reported in the layout and drawn in a neutral dark so
+  they never read as scene content.
 - The 426×240 preset is 1.775 rather than exactly 1.778. This is the value the
   art bible names; the layout pass re-derives exact size from the live aspect, so
   the world is still unstretched.
 - The capture script runs Vite in-process and launches headless Chromium with
   SwiftShader (software WebGL). It is a smoke/evidence tool, not a performance
-  benchmark.
+  benchmark. Reading the WebGL canvas back in-page returns transparent pixels
+  because the drawing buffer is not preserved, so the scale measurement decodes
+  the written screenshot instead.
 - `scripts/` is not covered by `tsconfig.json` (`include: ["src"]`), so the
   capture script is plain `.mjs` and checked by execution rather than by `tsc`.
 
