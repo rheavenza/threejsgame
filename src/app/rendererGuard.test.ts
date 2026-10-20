@@ -23,19 +23,39 @@ describe('detectWebGLSupport', () => {
     expect(detectWebGLSupport(() => canvas)).toBeNull();
   });
 
-  it('accepts webgl1 as a fallback', () => {
+  // three.js 0.180.0's WebGLRenderer requests only the 'webgl2' context name,
+  // with no WebGL 1 fallback. A WebGL-1-only browser must therefore be rejected
+  // here, or it passes the preflight and fails later in renderer construction
+  // with the less accurate 'context-creation-failed' message.
+  it('rejects a WebGL 1-only browser', () => {
     const { canvas } = fakeCanvas({ webgl: glStub });
-    expect(detectWebGLSupport(() => canvas)).toBeNull();
+    const failure = detectWebGLSupport(() => canvas);
+
+    expect(failure?.kind).toBe('no-webgl');
+    expect(failure?.message).toMatch(/WebGL 2/i);
+  });
+
+  it('never queries a webgl1 context', () => {
+    const requested: string[] = [];
+    const canvas = {
+      getContext: (kind: string) => {
+        requested.push(kind);
+        return kind === 'webgl2' ? glStub : null;
+      },
+    } as unknown as HTMLCanvasElement;
+
+    detectWebGLSupport(() => canvas);
+    expect(requested).toEqual(['webgl2']);
   });
 
   // Finding 3: without this guard, an unsupported browser threw an uncaught
   // "Error creating WebGL context." and showed an unexplained blank shell.
-  it('reports a friendly failure when neither context is available', () => {
+  it('reports a friendly failure when no context is available', () => {
     const { canvas } = fakeCanvas({});
     const failure = detectWebGLSupport(() => canvas);
 
     expect(failure?.kind).toBe('no-webgl');
-    expect(failure?.message).toMatch(/does not support WebGL/i);
+    expect(failure?.message).toMatch(/WebGL 2/i);
     expect(failure?.message).toMatch(/Chrome|Firefox/i);
   });
 

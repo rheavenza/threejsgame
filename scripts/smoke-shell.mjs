@@ -147,6 +147,41 @@ async function main() {
       await browser.close();
     }
 
+    // 2b. WebGL 1 only -------------------------------------------------------
+    // three.js 0.180.0 needs WebGL 2 and has no WebGL 1 fallback, so a
+    // WebGL-1-only browser must be caught by the preflight with the accurate
+    // message rather than failing later during renderer construction.
+    {
+      const browser = await chromium.launch();
+      const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+      await context.addInitScript(() => {
+        const original = HTMLCanvasElement.prototype.getContext;
+        HTMLCanvasElement.prototype.getContext = function (kind, ...rest) {
+          if (kind === 'webgl2') return null;
+          return original.call(this, kind, ...rest);
+        };
+      });
+      const page = await context.newPage();
+      const pageErrors = [];
+      page.on('pageerror', (e) => pageErrors.push(e.message));
+
+      await page.goto(baseUrl, { waitUntil: 'load' });
+      await page.waitForTimeout(900);
+
+      const state = await page.evaluate(() => ({
+        failure: document.getElementById('app')?.dataset.rendererFailure ?? null,
+        text: document.querySelector('.renderer-notice__body')?.textContent ?? '',
+        canvas: Boolean(document.querySelector('canvas')),
+      }));
+
+      check('webgl1-only sets a failure state', state.failure === 'no-webgl', String(state.failure));
+      check('webgl1-only names WebGL 2 in the message', /WebGL 2/i.test(state.text));
+      check('webgl1-only does not append a canvas', !state.canvas);
+      check('webgl1-only throws no uncaught error', pageErrors.length === 0, pageErrors.join(' | '));
+
+      await browser.close();
+    }
+
     // 3. Context loss and restore -------------------------------------------
     {
       const browser = await chromium.launch();

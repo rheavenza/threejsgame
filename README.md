@@ -100,9 +100,9 @@ reference image.
 
 ### Shell smoke test
 
-To exercise the application shell headlessly — normal startup, the browser
-without WebGL, WebGL context loss and restore, and resize — and fail on any
-uncaught error:
+To exercise the application shell headlessly — normal startup, a browser with no
+WebGL, a WebGL-1-only browser, context loss and restore, and resize — and fail on
+any uncaught error:
 
 ```sh
 npm run smoke
@@ -112,15 +112,16 @@ Output and screenshots go to `docs/evidence/T00-007/`.
 
 ### When the scene cannot render
 
-If the browser has no WebGL, or cannot create a context, the shell shows a short
-explanation instead of a blank page. The canvas is not appended and no uncaught
+The scene requires **WebGL 2**: three.js 0.180.0 requests a `webgl2` context and
+has no WebGL 1 fallback. A browser that cannot provide one gets a short
+explanation instead of a blank page — the canvas is not appended and no uncaught
 error is thrown. If the GPU context is lost while the page is open, rendering
 pauses, a console warning is logged, and the scene redraws automatically once
 the browser restores the context.
 
 ```mermaid
 flowchart TD
-  A[Load page] --> B{WebGL available?}
+  A[Load page] --> B{WebGL 2 available?}
   B -- No --> C[Show "could not be drawn" notice]
   B -- Yes --> D[Create renderer and pipeline]
   D --> E[Observe host size]

@@ -22,6 +22,19 @@ export interface RendererFailure {
  * real renderer so an unsupported browser produces a calm message instead of an
  * uncaught `Error creating WebGL context.`
  */
+/**
+ * Probes for a usable WebGL **2** context in a throwaway canvas.
+ *
+ * Returns null when a context is available. This runs *before* constructing the
+ * real renderer so an unsupported browser produces a calm message instead of an
+ * uncaught `Error creating WebGL context.`
+ *
+ * WebGL 2 is required, not merely preferred: three.js 0.180.0's WebGLRenderer
+ * requests the `'webgl2'` context name and has no WebGL 1 fallback. Accepting a
+ * WebGL 1 context here would let a WebGL-1-only browser pass the preflight and
+ * then fail during renderer construction, which reports the less accurate
+ * `context-creation-failed` message.
+ */
 export function detectWebGLSupport(
   createCanvas: () => HTMLCanvasElement = () => document.createElement('canvas'),
 ): RendererFailure | null {
@@ -37,7 +50,7 @@ export function detectWebGLSupport(
 
   let context: RenderingContext | null = null;
   try {
-    context = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+    context = canvas.getContext('webgl2');
   } catch {
     context = null;
   }
@@ -46,7 +59,7 @@ export function detectWebGLSupport(
     return {
       kind: 'no-webgl',
       message:
-        'This browser does not support WebGL, which this scene needs to render. ' +
+        'This scene needs WebGL 2, which this browser does not provide. ' +
         'Try a recent version of Chrome, Firefox, Edge, or Safari, and check that ' +
         'hardware acceleration is enabled.',
     };

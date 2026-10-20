@@ -64,15 +64,15 @@ Commands run on this branch with observed results:
 
 | Command | Result |
 |---|---|
-| `npm test` | **43 passed / 43** (4 files) |
+| `npm test` | **44 passed / 44** (4 files) |
 | `npm run typecheck` | **clean** |
-| `npm run build` | **clean**, 498.51 kB JS / 128.01 kB gzip |
-| `npm run smoke` | **16 / 16 checks passed** |
+| `npm run build` | **clean** |
+| `npm run smoke` | **20 / 20 checks passed** |
 | `npm --prefix tools/assetforge run check` | **0** |
 | `npm --prefix tools/assetforge test` | **7 passed / 7** |
 
-New unit tests: `rendererGuard.test.ts` (13) and `resizeController.test.ts` (6).
-Totals moved from 24 to 43.
+New unit tests: `rendererGuard.test.ts` (14, including the WebGL-1-only case) and
+`resizeController.test.ts` (6). Totals moved from 24 to 44.
 
 ### `npm run smoke` output
 
@@ -88,6 +88,10 @@ PASS  no-WebGL sets a failure state — no-webgl
 PASS  no-WebGL shows a readable notice
 PASS  no-WebGL does not append a canvas
 PASS  no-WebGL throws no uncaught error
+PASS  webgl1-only sets a failure state — no-webgl
+PASS  webgl1-only names WebGL 2 in the message
+PASS  webgl1-only does not append a canvas
+PASS  webgl1-only throws no uncaught error
 PASS  context loss is detected — true
 PASS  context restore clears the lost flag
 PASS  canvas survives the restore
@@ -103,8 +107,9 @@ mode the ticket warned about.
 
 1. `npm install && npm run dev`
 2. Normal: the valley renders at `http://localhost:5173/`.
-3. No WebGL: open DevTools → Rendering → or block WebGL, then reload. Expect the
-   "The valley could not be drawn" notice and **no** uncaught error in console.
+3. No WebGL 2: block `webgl2` (or WebGL entirely) and reload. Expect the "The
+   valley could not be drawn" notice and **no** uncaught error in console. The
+   message names WebGL 2 specifically, since three.js has no WebGL 1 fallback.
 4. Context loss: in the console, take the canvas's `WEBGL_lose_context` extension
    and call `loseContext()`, then `restoreContext()`. Expect a console warning,
    `#app[data-context-lost]` during the loss, and a redrawn scene after restore.
@@ -133,7 +138,7 @@ touched. The look-dev evidence for T00-002 is unaffected.
 | One resize trigger path, or duplication documented | **pass** — single `ResizeObserver`; coalescing unit-tested |
 | Evidence captures state viewport, browser, commit | **pass** — `docs/evidence/T00-001/README.md` |
 | `npm test`, `typecheck`, `build` pass; no console errors | **pass** |
-| Each fix exercisable without WebGL has a unit test | **pass** — 19 new unit tests |
+| Each fix exercisable without WebGL has a unit test | **pass** — 20 new unit tests |
 
 ## Remaining work / known limits
 
@@ -155,8 +160,36 @@ touched. The look-dev evidence for T00-002 is unaffected.
 - [x] No scene composition, palette, or art-direction change.
 - [x] Human-only visual/narrative gates remain pending.
 
-## Handoff
+## Review responses
 
-- [x] Ticket acceptance criteria checked individually.
-- [ ] Follow-up tickets filed — none needed; finding 1 needs only a status note
-      from the planning agent.
+### WebGL 2 is now required, not just preferred — fixed
+
+The review was correct. Verified against the installed dependency rather than the
+docs: `node_modules/three/build/three.module.js` (three 0.180.0) requests only
+`const contextName = 'webgl2'` and has **no WebGL 1 fallback**. The original
+probe accepted `getContext('webgl')`, so a WebGL-1-only browser passed the
+preflight and then failed during renderer construction, reporting the less
+accurate `context-creation-failed` message.
+
+- `detectWebGLSupport()` now probes `webgl2` only.
+- The message names WebGL 2: "This scene needs WebGL 2, which this browser does
+  not provide."
+- The unit test that asserted WebGL 1 was sufficient has been replaced with one
+  asserting it is **rejected**, plus a test that `webgl1` is never queried.
+- A `webgl1-only` scenario was added to the smoke test. Verified in a browser
+  with `webgl2` denied: failure state `no-webgl`, no canvas, and **0** uncaught
+  errors.
+
+### Ticket authorization — owner action required
+
+The review is right that this is unresolved, and per `AGENTS.md` §6 I must not
+change it myself: *"Do not alter the official task status; the planning/review
+agent updates status after acceptance/merge."*
+
+Current state on `master`: the ticket header reads **PROPOSED — not scheduled**
+and `docs/TASKLIST.md` lists T00-007 as proposed and unscheduled. This branch was
+opened on the owner's explicit instruction to proceed with T00-007, which is why
+the work exists. **The ticket needs the planning/owner workflow to mark it READY
+(or otherwise authorize it) before this PR is treated as merge-ready.** I have
+deliberately left both files untouched so the status change is not made silently
+by the implementation worker.
